@@ -7,7 +7,6 @@ from myRegex import re_time
 bot = Botoy()
 masterQQ = os.environ['targetQQ']
 
-
 @bot.friend_context_use
 def _(ctx):
     # Block msg except from masterQQ
@@ -65,9 +64,36 @@ def get_msg(ctx):
             try:
                 msgDate = datetime(year, month, day)
             except ValueError as e:
-                action.sendFriendText(ctx.FromUin, e)
+                action.sendFriendText(ctx.FromUin, str(e))
                 return
-            
+
+        if(m.group(7) == None and group(8) == None):
+            msgTime = datetime(2000, 1, 1, 20)
+        elif(m.group(8) == None):
+            if(m.group(7) == "上午"):
+                msgTime = datetime(2000, 1, 1, 12)
+            else:
+                msgTime = datetime(2000, 1, 1, 20)
+        elif(m.group(7) == None):
+            tmp = int(m.group(7)[:-1])
+            try:
+                msgTime = datetime(2000, 1, 1, tmp)
+            except ValueError as e:
+                action.sendFriendText(ctx.FromUin, str(e))
+                return
+        else:
+            tmp = int(m.group(8)[:-1])
+            if(m.group(7) == "上午"):
+                if(tmp > 12):
+                    action.sendFriendText(ctx.FromUin, "上午怎么可能超过12点嘛！")
+                    return
+                msgTime = datetime(2000, 1, 1, tmp)
+            else:
+                if(tmp < 12):
+                    msgTime = datetime(2000, 1, 1, tmp+12)
+                else:
+                    msgTime = datetime(2000, 1, 1, tmp)
+        msgDate = msgDate.replace(hour=msgTime.hour, minute=0, second=0, microsecond=0)
         action.sendFriendText(ctx.FromUin, str(msgDate))
 
 
