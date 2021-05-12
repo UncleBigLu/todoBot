@@ -65,7 +65,7 @@ def parse_input(ctx, action):
                 action.sendFriendText(ctx.FromUin, str(e))
                 return None
 
-        if(m.group(7) == None and group(8) == None):
+        if(m.group(7) == None and m.group(8) == None):
             msgTime = datetime(2000, 1, 1, 20)
         elif(m.group(8) == None):
             if(m.group(7) == "上午"):

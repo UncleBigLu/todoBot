@@ -3,7 +3,7 @@
 import os
 import psycopg2
 from psycopg2 import sql
-from datetime import date, datetime
+from datetime import date, datetime, timedelta
 
 DB_NAME = 'todobot'
 TABLE_NAME = 'todolist'
@@ -22,10 +22,8 @@ def disconnect_sql(conn, cur):
     conn.close()
 
 def insert_data(time, event):
-    try:
-        conn, cur = connect_sql()
-    except psycopg2.DatabaseError as e:
-        return False
+
+    conn, cur = connect_sql()
     current_time = datetime.now()
    
     cur.execute(
@@ -38,4 +36,35 @@ def insert_data(time, event):
     conn.commit()
 
     disconnect_sql(conn, cur)
+
+def select_daily():
+    conn, cur = connect_sql()
+
+    current_time = datetime.now()
+    cur.execute(
+        '''
+        SELECT event_name FROM todolist
+        WHERE todo_time::date = %s;
+        '''
+        , [current_time.date()]
+    )
+    ret = cur.fetchall()
     
+    disconnect_sql(conn, cur)
+    return ret
+
+def select_per_hour():
+    conn, cur = connect_sql()
+
+    current_time = datetime.now()
+    cur.execute(
+        '''
+        SELECT event_name, todo_time FROM todolist
+        WHERE todo_time BETWEEN %s AND %s;
+        '''
+        , [current_time, current_time+timedelta(hours=4)]
+    )
+    ret = cur.fetchall()
+    disconnect_sql(conn, cur)
+    return ret
+
