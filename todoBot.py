@@ -3,9 +3,14 @@ from botoy import decorators as deco
 import os
 
 from myRegex import parse_input
+from sqlFunc import insert_data
 
 bot = Botoy()
 masterQQ = os.environ['targetQQ']
+
+def mark_event():
+    # TO DO
+    return
 
 @bot.friend_context_use
 def _(ctx):
@@ -19,10 +24,20 @@ def _(ctx):
 def get_msg(ctx):
     action = Action(ctx.CurrentQQ)
 
-    msgDate = parse_input(ctx, action)
-    if msgDate is None:
+    if ctx.MsgType == "ReplayMsg":
+        # Mark the event as completed
+        mark_event()
         return
-    action.sendFriendText(ctx.FromUin, str(msgDate))
+
+    # Try to add new event
+    parse_ret = parse_input(ctx, action)
+    if parse_ret is None:
+        return
+    # action.sendFriendText(ctx.FromUin, str(parse_ret[0])+'\n'+str(parse_ret[1]))
+    if insert_data(parse_ret[0], parse_ret[1]) == False:
+        action.sendFriendText(ctx.FromUin, "数据库故障了Σ(っ °Д °;)っ")
+    
+
 
 
             

@@ -31,6 +31,8 @@ def parse_input(ctx, action):
         if(m.group(2) == None and m.group(3) == None):
             msgDate = currentTime
         if(m.group(2) != None and m.group(3) == None):
+            if(m.group(2) == "今天"):
+                msgDate = currentTime
             if(m.group(2) == "明天"):
                 msgDate = currentTime + timedelta(days=1)
             if(m.group(2) == "后天"):
@@ -97,4 +99,8 @@ def parse_input(ctx, action):
         if msgDate < currentTime:
             action.sendFriendText(ctx.FromUin, "时间已经过了啦...")
             return None
-        return msgDate
+        
+        # Get the event name
+        time_len = len(m.group(0))
+        event_name = ctx.Content[time_len:]
+        return [msgDate, event_name]
